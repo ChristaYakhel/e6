@@ -1,1 +1,1 @@
-# e6
+# Cryptocurrency Wallet System – Store and track digital currency transactions.
