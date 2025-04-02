@@ -1,0 +1,65 @@
+import json
+import os
+
+WALLET_FILE = "transactions.json"
+
+class CryptoWallet:
+    def __init__(self):
+        self.load_wallet()
+
+    def load_wallet(self):
+        """Load wallet balance from a JSON file"""
+        if os.path.exists(WALLET_FILE):
+            with open(WALLET_FILE, "r") as file:
+                self.wallet_data = json.load(file)
+        else:
+            self.wallet_data = {"balance": 0, "transactions": []}
+
+    def save_wallet(self):
+        """Save wallet data to a JSON file"""
+        with open(WALLET_FILE, "w") as file:
+            json.dump(self.wallet_data, file, indent=4)
+
+    def add_funds(self, amount):
+        """Add funds to the wallet"""
+        self.wallet_data["balance"] += amount
+        self.wallet_data["transactions"].append({"type": "deposit", "amount": amount})
+        self.save_wallet()
+        print(f"✅ Added {amount} crypto to wallet. New Balance: {self.wallet_data['balance']}")
+
+    def send_funds(self, amount):
+        """Send funds from the wallet"""
+        if amount > self.wallet_data["balance"]:
+            print("❌ Insufficient balance!")
+            return
+        self.wallet_data["balance"] -= amount
+        self.wallet_data["transactions"].append({"type": "send", "amount": amount})
+        self.save_wallet()
+        print(f"✅ Sent {amount} crypto. New Balance: {self.wallet_data['balance']}")
+
+    def show_wallet(self):
+        """Display wallet balance and transaction history"""
+        print("\n📜 Wallet Balance:", self.wallet_data["balance"])
+        print("📊 Transaction History:")
+        for tx in self.wallet_data["transactions"]:
+            print(f"➡️ {tx['type'].capitalize()}: {tx['amount']}")
+
+if __name__ == "__main__":
+    wallet = CryptoWallet()
+    while True:
+        print("\n1️⃣ Add Funds\n2️⃣ Send Funds\n3️⃣ Show Wallet\n4️⃣ Exit")
+        choice = input("Enter choice: ")
+
+        if choice == "1":
+            amount = float(input("Enter amount to add: "))
+            wallet.add_funds(amount)
+        elif choice == "2":
+            amount = float(input("Enter amount to send: "))
+            wallet.send_funds(amount)
+        elif choice == "3":
+            wallet.show_wallet()
+        elif choice == "4":
+            print("🔒 Exiting Wallet...")
+            break
+        else:
+            print("❌ Invalid choice! Try again.")
